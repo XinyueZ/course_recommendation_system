@@ -5,13 +5,13 @@ from sklearn.decomposition import PCA
 
 def cluster_similarity_prediction(user_id, bow_df, rating_df, n_clusters, n_components=None):
     # User-rated-items sparse matrix
-    all_items_genre_df = bow_df.pivot(index='doc_id', columns='token', values='bow').fillna(
+    bow_sparse_df = bow_df.pivot(index='doc_id', columns='token', values='bow').fillna(
         0).rename_axis(index=None, columns=None).reset_index().rename(columns={'index': 'doc_id'})
 
     # User profile with item features
-    all_users_item_genre_df = rating_df.merge(
-        all_items_genre_df, left_on='item', right_on="doc_id").drop(columns=['doc_id', 'item', 'rating'])
-    all_users_feature_df = all_users_item_genre_df.groupby(
+    all_users_profile_df = rating_df.merge(
+        bow_sparse_df, left_on='item', right_on="doc_id").drop(columns=['doc_id', 'item', 'rating'])
+    all_users_feature_df = all_users_profile_df.groupby(
         'user_x').sum().reset_index()
 
     # Clustering based on user profile (feature vector)
@@ -20,7 +20,7 @@ def cluster_similarity_prediction(user_id, bow_df, rating_df, n_clusters, n_comp
     # PCA if possible
     if n_components is not None:
         pca = PCA(n_components=n_components)
-        features = pca.fit_transform(features) 
+        features = pca.fit_transform(features)
 
     labels = KMeans(n_clusters=n_clusters,
                     random_state=23).fit_predict(features)
@@ -62,6 +62,6 @@ def cluster_similarity_prediction(user_id, bow_df, rating_df, n_clusters, n_comp
         unseen_item_id = row['item']
         res[unseen_item_id] = row['popularity']
 
-    del all_users_item_genre_df, label_df, all_users_cluster_df, all_users_item_and_cluster_df, cluster_item_popularity_df, unseen_item_popularity_df
+    del bow_sparse_df, all_users_profile_df, label_df, all_users_cluster_df, all_users_item_and_cluster_df, cluster_item_popularity_df, unseen_item_popularity_df
     return {k: v for k, v in sorted(
             res.items(), key=lambda item: item[1], reverse=True)}
