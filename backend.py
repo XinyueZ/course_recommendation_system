@@ -81,7 +81,6 @@ def predict(model_name, user_ids, params):
         # TODO: Add prediction model code here
         # User Profile model
         if model_name == models[1]:
-            threshold = threshold / 100.0
             # Use bows to build course genre profile
             all_items_df = load_courses()
             bow_df = load_bow()
@@ -92,7 +91,8 @@ def predict(model_name, user_ids, params):
 
             # Top-courses recommendation
             for idx, (item_id, score) in enumerate(res.items()):
-                if idx <= top_courses and score >= threshold:
+                score = score/100
+                if idx <= top_courses and (score) >= threshold:
                     users.append(user_id)
                     courses.append(item_id)
                     scores.append(score)

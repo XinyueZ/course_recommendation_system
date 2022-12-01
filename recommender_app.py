@@ -123,9 +123,9 @@ elif model_selection == backend.models[1]:
     top_courses = st.sidebar.slider('Top courses',
                                     min_value=0, max_value=100,
                                     value=10, step=1)
-    profile_sim_threshold = st.sidebar.slider('User Profile Similarity Threshold %',
-                                              min_value=0, max_value=100,
-                                              value=50, step=10)
+    profile_sim_threshold = st.sidebar.slider('User Profile Similarity Threshold',
+                                              min_value=0.0, max_value=1.0,
+                                              value=0.1, step=0.1)
 
     params['top_courses'] = top_courses
     params['threshold'] = profile_sim_threshold
